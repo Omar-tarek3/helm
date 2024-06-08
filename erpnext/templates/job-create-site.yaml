@@ -36,6 +36,8 @@ spec:
                 fi
               done;
               echo "sites/common_site_config.json found";
+              #TODO
+              
           resources:
             {{- toYaml .Values.jobs.createSite.resources | nindent 12 }}
           securityContext:
@@ -61,12 +63,14 @@ spec:
         {{- if .Values.jobs.createSite.installApps }}
           {{- range .Values.jobs.createSite.installApps }}
             --install-app={{ . }}
-          {{- end }}
+          {{- end }}gi
         {{- end }}
           {{- if .Values.jobs.createSite.forceCreate }}
             --force
-          {{- end }}
-            ;rm -f currentsite.txt
+          {{- end }} 
+            ;
+            bench --site erp.cluster.local install-app hrms
+            ; rm -f currentsite.txt
         env:
           - name: "SITE_NAME"
             value: "{{ .Values.jobs.createSite.siteName }}"
@@ -100,7 +104,7 @@ spec:
             {{- else if .Values.postgresql.enabled }}
             value: "postgres"
             {{- else if .Values.mariadb.enabled }}
-            value: "root"
+            value: "root" #root
             {{- end }}
           - name: "DB_ROOT_PASSWORD"
             {{- if .Values.dbRootPassword }}
@@ -114,10 +118,11 @@ spec:
                 key: postgres-password
                 name: {{ .Release.Name }}-postgresql
             {{- else if .Values.mariadb.enabled }}
-            valueFrom:
-              secretKeyRef:
-                key: mariadb-root-password
-                name: {{ .Release.Name }}-mariadb
+            value: "changeit"
+            # valueFrom:
+            #   secretKeyRef:
+            #     key: mariadb-root-password
+            #     name: {{ .Release.Name }}-mariadb
             {{- end }}
           - name: "ADMIN_PASSWORD"
             value: "{{ .Values.jobs.createSite.adminPassword }}"
